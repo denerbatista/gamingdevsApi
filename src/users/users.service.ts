@@ -12,6 +12,7 @@ import { Users } from "./entities/users.entities";
 import { Profiles } from "src/profiles/entities/profiles.entities";
 import { JwtService } from "@nestjs/jwt";
 import nodeMailer from "nodemailer";
+import recoveryPasswordMessage from "src/utils/recoveryPasswordMessage";
 @Injectable()
 export class UsersService {
 	private userSelect = {
@@ -208,14 +209,15 @@ export class UsersService {
 
 		const token = this.jwtService.sign({ email });
 
-		const linkRecoveryText = `Olá ${user.name}, \nVocê solicitou o e-mail de recuperação de senha. Clique no link abaixo e siga as instruções para acessar o sistema. \nhttps://gamedevs.vercel.app/recover/${user.id}/${token}.`;
-		const linkRecoveryHtml = `<h4>Olá ${user.name},</h4>
-		<p>Você solicitou o e-mail de recuperação de senha. Clique <a href="https://gamedevs.vercel.app/recover/${user.id}/${token}">aqui</a> e siga as instruções para acessar o sistema.</p>`;
+		const recoveryMessage = recoveryPasswordMessage(
+			user,
+			token,
+		);
 
 		this.sendEmail(
 			email,
-			linkRecoveryText,
-			linkRecoveryHtml,
+			recoveryMessage.messageText,
+			recoveryMessage.messageHtml,
 		);
 
 		return {
@@ -245,6 +247,13 @@ export class UsersService {
 			html: html,
 		};
 
-		await transport.sendMail(message);
+		await transport
+			.sendMail(message)
+			.then(() =>
+				console.log(
+					`Email of "${message.subject}" sent to "${email}"`,
+				),
+			)
+			.catch((err: unknown) => console.log(err));
 	}
 }

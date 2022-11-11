@@ -7,7 +7,7 @@ import {
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { PrismaService } from "src/prisma/prisma.service";
-import { Prisma } from "@prisma/client";
+import Prisma from "@prisma/client";
 import { Users } from "src/users/entities/users.entities";
 import { Profiles } from "./entities/profiles.entities";
 
